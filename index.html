@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gara Muleta Charitable Organization</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --main: #2e7d32; --gold: #FFD700; --dark: #1b1b1b; --text: #ffffff; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: #f4f4f4; color: #333; }
+        
+        /* Header & Hero Section */
+        header { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1000&q=80'); 
+                 background-size: cover; color: white; text-align: center; padding: 100px 20px; }
+        header h1 { font-size: 35px; color: var(--gold); margin: 0; }
+        header p { font-size: 18px; font-style: italic; }
+
+        .container { max-width: 900px; margin: -50px auto 20px; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        h2 { color: var(--main); border-bottom: 2px solid var(--gold); display: inline-block; }
+        .bank-box { background: #e8f5e9; padding: 15px; border-left: 5px solid var(--main); font-weight: bold; font-size: 18px; }
+        
+        .post-item { border-bottom: 1px solid #ddd; padding: 15px 0; }
+        .post-item h3 { margin: 0; color: #333; }
+        .post-item small { color: #888; }
+
+        /* Admin Section */
+        #adminArea { display: none; background: #fffde7; border: 2px dashed var(--gold); }
+        input, textarea, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
+        button { background: var(--main); color: white; font-weight: bold; cursor: pointer; border: none; }
+        button:hover { background: #1b5e20; }
+        
+        .contact-link { display: flex; align-items: center; text-decoration: none; color: #333; margin: 10px 0; font-weight: bold; }
+        .whatsapp-btn { background: #25d366; color: white; padding: 10px; border-radius: 5px; text-align: center; display: block; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>GARA MULETA</h1>
+    <h3>Charitable Organization</h3>
+    <p>"Namoonni Rabiin waa Harka Isiin Kaahe Nu Gargaraa"</p>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>💰 Gargaarsa Galchuf</h2>
+        <p>Gargaarsa keessan kallaattiin herrega baankii armaan gadiitti galchuu dandeessu:</p>
+        <div class="bank-box">
+            Commercial Bank of Ethiopia (CBE)<br>
+            Account: 1000680333207
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📞 Qunnamtiif</h2>
+        <p>Bilbila: <strong>0987873191</strong></p>
+        <p>Email: <strong>caffeahmed4@gmail.com</strong></p>
+        <a href="https://wa.me/966578914377" class="whatsapp-btn">💬 Chat on WhatsApp (+966578914377)</a>
+    </div>
+
+    <div class="card">
+        <h2>📢 Odeeffannoo Haaraa (Posts)</h2>
+        <div id="newsFeed">Loading posts...</div>
+    </div>
+
+    <button onclick="showAdmin()" style="background: #333; font-size: 12px;">Admin Login (Post Gochuuf)</button>
+    <div id="adminArea" class="card">
+        <h2>✍️ Post Haaraa Galchi</h2>
+        <input type="password" id="adminPass" placeholder="Admin Password">
+        <input type="text" id="postTitle" placeholder="Mataduree (Title)">
+        <textarea id="postDesc" placeholder="Odeeffannoo (Description)"></textarea>
+        <button onclick="savePost()">PUBLISH POST</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyC1_0Ptpna4V-2cfyJHNwIvWvbA2eGLv18",
+  authDomain: "sbm-app-ecf59.firebaseapp.com",
+  projectId: "sbm-app-ecf59",
+  storageBucket: "sbm-app-ecf59.firebasestorage.app",
+  messagingSenderId: "666387083873",
+  appId: "1:666387083873:web:bfd6d5e064ecaad6c73020"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Fetch Posts
+db.collection("charity_posts").orderBy("time", "desc").onSnapshot(snap => {
+    const feed = document.getElementById("newsFeed");
+    feed.innerHTML = "";
+    snap.forEach(doc => {
+        const d = doc.data();
+        feed.innerHTML += `
+            <div class="post-item">
+                <h3>${d.title}</h3>
+                <p>${d.desc}</p>
+                <small>${d.time ? d.time.toDate().toLocaleDateString() : ''}</small>
+            </div>`;
+    });
+});
+
+function showAdmin() {
+    const pass = prompt("Enter Admin Password:");
+    if(pass === "1234") { // Password kana jijjiiruu dandeessa
+        document.getElementById("adminArea").style.display = "block";
+    } else { alert("Wrong Password!"); }
+}
+
+function savePost() {
+    const t = document.getElementById("postTitle").value;
+    const d = document.getElementById("postDesc").value;
+    if(!t || !d) return alert("Hunda guuti!");
+
+    db.collection("charity_posts").add({
+        title: t, desc: d, time: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        alert("Post Published! ✅");
+        document.getElementById("postTitle").value = "";
+        document.getElementById("postDesc").value = "";
+    });
+}
+</script>
+</body>
+</html>
