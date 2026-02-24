@@ -79,7 +79,7 @@
     <button onclick="showAdmin()" style="background: #333; font-size: 10px; opacity: 0.5;">ADMIN LOGIN</button>
 
     <div id="adminArea" class="card">
-        <h2>✍️ Post Gochuuf</h2>
+        <h2>✍️ Admin Panel (Post Gochuuf)</h2>
         <select id="pType">
             <option value="news">Odeeffannoo (News)</option>
             <option value="media">Suuraa/Viidiyoo (Gallery)</option>
@@ -94,65 +94,62 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
+// Config haaraa ati ergte
 const firebaseConfig = {
-  apiKey: "AIzaSyC1_0Ptpna4V-2cfyJHNwIvWvbA2eGLv18",
-  authDomain: "sbm-app-ecf59.firebaseapp.com",
-  projectId: "sbm-app-ecf59",
-  storageBucket: "sbm-app-ecf59.firebasestorage.app",
-  messagingSenderId: "666387083873",
-  appId: "1:666387083873:web:bfd6d5e064ecaad6c73020"
+  apiKey: "AIzaSyC-Owlqf-GVkm296DXT2ccR212x72r9Vg4",
+  authDomain: "garaa-mulataa.firebaseapp.com",
+  projectId: "garaa-mulataa",
+  storageBucket: "garaa-mulataa.firebasestorage.app",
+  messagingSenderId: "758391808027",
+  appId: "1:758391808027:web:cff23c730cdba3ae7dd8be",
+  measurementId: "G-6QX2RZY4JK"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 1. Fetch News
-db.collection("gara_news").orderBy("time", "desc").onSnapshot(s => {
+// Fetch Data
+db.collection("news").orderBy("time", "desc").onSnapshot(s => {
     const f = document.getElementById("newsFeed"); f.innerHTML = "";
     if (s.empty) f.innerHTML = "Odeeffannoon hin jiru.";
-    s.forEach(d => { const data = d.data(); f.innerHTML += `<div class="item-row"><h3>${data.title}</h3><p>${data.desc}</p></div>`; });
+    s.forEach(d => { f.innerHTML += `<div class="item-row"><h3>${d.data().title}</h3><p>${d.data().desc}</p></div>`; });
 });
 
-// 2. Fetch Gallery
-db.collection("gara_media").orderBy("time", "desc").onSnapshot(s => {
+db.collection("media").orderBy("time", "desc").onSnapshot(s => {
     const g = document.getElementById("mediaGallery"); g.innerHTML = "";
     s.forEach(d => { 
         const data = d.data();
-        const isV = (data.url && data.url.includes('mp4'));
+        const isV = data.url && data.url.includes('mp4');
         g.innerHTML += `<div class="gallery-item">${isV ? `<video src="${data.url}" controls></video>` : `<img src="${data.url}">`}<p>${data.desc}</p></div>`;
     });
 });
 
-// 3. Fetch Notebook
-db.collection("gara_notes").orderBy("time", "desc").onSnapshot(s => {
+db.collection("notes").orderBy("time", "desc").onSnapshot(s => {
     const l = document.getElementById("commentsList"); l.innerHTML = "";
-    s.forEach(d => { const data = d.data(); l.innerHTML += `<div class="item-row"><strong>${data.name}:</strong> ${data.msg}</div>`; });
+    s.forEach(d => { l.innerHTML += `<div class="item-row"><strong>${d.data().name}:</strong> ${d.data().msg}</div>`; });
 });
 
-function showAdmin() { if(prompt("Password Admin Galchi:") === "1234") document.getElementById("adminArea").style.display = "block"; }
+function showAdmin() { if(prompt("Password:") === "1234") document.getElementById("adminArea").style.display = "block"; }
 
 function publish() {
     const t = document.getElementById("pType").value;
     const title = document.getElementById("pTitle").value;
     const desc = document.getElementById("pDesc").value;
-    if(!title || !desc) return alert("Bakka duwwaa guuti!");
-    
-    const col = (t === "news") ? "gara_news" : "gara_media";
+    const col = (t === "news") ? "news" : "media";
     const payload = (t === "news") ? { title, desc } : { url: title, desc };
     payload.time = firebase.firestore.FieldValue.serverTimestamp();
     
     db.collection(col).add(payload).then(() => { 
-        alert("Odeeffannoon Galmeeffameera! ✅");
+        alert("Odeeffannoon Galmaa'era! ✅");
         location.reload(); 
-    }).catch(e => alert("Error: " + e.message));
+    }).catch(e => alert("Hayyama (Rules) sirreessuu kee mirkaneessi!"));
 }
 
 function saveComment() {
     const name = document.getElementById("vName").value || "Anonymous";
     const msg = document.getElementById("vMsg").value;
-    if(!msg) return alert("Yaada barreessi!");
-    db.collection("gara_notes").add({ name, msg, time: firebase.firestore.FieldValue.serverTimestamp() }).then(() => {
-        alert("Yaadni kee nu ga'eera!");
+    db.collection("notes").add({ name, msg, time: firebase.firestore.FieldValue.serverTimestamp() }).then(() => {
+        alert("Galatoomi!");
         document.getElementById("vMsg").value = "";
     });
 }
