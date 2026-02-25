@@ -7,42 +7,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root { --main: #2e7d32; --gold: #FFD700; --dark: #1b1b1b; --white: #ffffff; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; background: #f0f2f5; color: #333; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: #f0f2f5; color: #333; line-height: 1.6; }
         
         header { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1000&q=80'); 
-                 background-size: cover; background-position: center; color: white; text-align: center; padding: 80px 20px; border-bottom: 5px solid var(--gold); }
-        header h1 { font-size: clamp(30px, 8vw, 50px); color: var(--gold); margin: 0; text-transform: uppercase; }
+                 background-size: cover; background-position: center; color: white; text-align: center; padding: 60px 20px; border-bottom: 5px solid var(--gold); }
+        header h1 { font-size: clamp(28px, 7vw, 45px); color: var(--gold); margin: 0; text-transform: uppercase; letter-spacing: 2px; }
+        header p { font-style: italic; opacity: 0.9; margin-top: 10px; }
 
-        .container { max-width: 900px; margin: -40px auto 40px; padding: 0 15px; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 25px; border-top: 4px solid var(--main); }
+        .container { max-width: 900px; margin: -30px auto 40px; padding: 0 15px; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.1); margin-bottom: 25px; border-top: 5px solid var(--main); }
         
-        h2 { color: var(--main); border-bottom: 2px solid var(--gold); padding-bottom: 5px; margin-top: 0; }
-        .bank-box { background: #e8f5e9; padding: 20px; border-radius: 10px; border-left: 6px solid var(--main); font-weight: bold; font-size: 1.1rem; }
+        h2 { color: var(--main); border-bottom: 2px solid var(--gold); padding-bottom: 8px; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        .bank-box { background: #e8f5e9; padding: 20px; border-radius: 10px; border-left: 6px solid var(--main); font-weight: bold; font-size: 1.1rem; color: #1b5e20; }
         
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .gallery-item { background: #000; border-radius: 12px; overflow: hidden; height: 250px; position: relative; }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
-        .gallery-item p { position: absolute; bottom: 0; background: rgba(0,0,0,0.7); color: white; width: 100%; padding: 10px; margin: 0; font-size: 13px; }
+        .gallery-item { background: #000; border-radius: 12px; overflow: hidden; height: 260px; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .gallery-item img, .gallery-item video { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-item p { position: absolute; bottom: 0; background: rgba(0,0,0,0.8); color: white; width: 100%; padding: 12px; margin: 0; font-size: 13px; box-sizing: border-box; }
 
         .item-row { border-bottom: 1px solid #eee; padding: 15px 0; }
-        .contact-info p { margin: 10px 0; font-size: 1.1rem; }
-        .whatsapp-btn { background: #25d366; color: white; padding: 15px; border-radius: 10px; text-align: center; display: block; text-decoration: none; font-weight: bold; margin-top: 15px; }
+        .item-row h3 { margin: 0 0 5px; color: var(--main); }
+        
+        .contact-info p { margin: 12px 0; font-size: 1.05rem; display: flex; align-items: center; gap: 10px; }
+        .whatsapp-btn { background: #25d366; color: white; padding: 15px; border-radius: 12px; text-align: center; display: block; text-decoration: none; font-weight: bold; transition: 0.3s; margin-top: 15px; }
+        .whatsapp-btn:hover { background: #128c7e; transform: translateY(-2px); }
 
         #adminArea { display: none; background: #fffde7; border: 2px dashed var(--gold); margin-top: 20px; }
-        input, textarea, select, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
-        button { background: var(--main); color: white; font-weight: bold; border: none; cursor: pointer; }
+        input, textarea, select, button { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        .btn-post { background: var(--main); color: white; font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; }
+        .btn-post:hover { background: #1b5e20; }
+        .admin-toggle { background: #333; color: #999; font-size: 10px; padding: 5px; border: none; border-radius: 5px; cursor: pointer; display: block; margin: 20px auto; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>GARA MULETA Charitable Organization</h1>
+    <h1>GARA MULETA Charitable Organization </h1>
     <p>"Namoonni Rabiin waa Harka Isiin Kaahe Nu Gargaraa"</p>
 </header>
 
 <div class="container">
     <div class="card">
         <h2>💰 Gargaarsa Galchuf</h2>
+        <p>Gargaarsa keessan karaa herrega baankii kanaan nuuf erguu dandeessu:</p>
         <div class="bank-box">
             Commercial Bank of Ethiopia (CBE)<br>
             Account: 1000680333207
@@ -62,23 +69,25 @@
     <div class="card">
         <h2>📞 Qunnamtiif</h2>
         <div class="contact-info">
-            <p><strong>Bilbila:</strong> 0987873191</p>
-            <p><strong>Email:</strong> caffeahmed4@gmail.com</p>
+            <p><strong>📍 Bakka:</strong> Gara Muleta, Ethiopia</p>
+            <p><strong>📞 Bilbila:</strong> 0987873191</p>
+            <p><strong>✉️ Email:</strong> caffeahmed4@gmail.com</p>
             <a href="https://wa.me/966578914377" class="whatsapp-btn">💬 Chat on WhatsApp</a>
         </div>
     </div>
 
-    <button onclick="showAdmin()" style="background: #333; font-size: 10px; opacity: 0.5;">ADMIN LOGIN</button>
+    <button class="admin-toggle" onclick="showAdmin()">ADMIN LOGIN</button>
 
     <div id="adminArea" class="card">
-        <h2>✍️ Admin Panel</h2>
+        <h2>✍️ Admin Control Panel</h2>
+        <p style="font-size: 13px; color: #666;">Suuraa/Viidiyoo galchuuf linkii (URL) kallaattiin itti naqaa.</p>
         <select id="pType">
-            <option value="news">Odeeffannoo (News)</option>
-            <option value="media">Suuraa (Gallery URL)</option>
+            <option value="news">Odeeffannoo (Barreeffama)</option>
+            <option value="media">Galmee (Suuraa ykn Viidiyoo)</option>
         </select>
-        <input type="text" id="pTitle" placeholder="Mataduree ykn Linkii Suuraa">
-        <textarea id="pDesc" placeholder="Ibsa gabaabaa..."></textarea>
-        <button onclick="publish()">PUBLISH NOW</button>
+        <input type="text" id="pTitle" placeholder="Mataduree ykn Linkii URL">
+        <textarea id="pDesc" placeholder="Ibsa gabaabaa asitti barreessi..."></textarea>
+        <button class="btn-post" onclick="publish()">PUBLISH NOW</button>
     </div>
 </div>
 
@@ -86,7 +95,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <script>
-// Config kee isa sirrii
 const firebaseConfig = {
   apiKey: "AIzaSyC-Owlqf-GVkm296DXT2ccR212x72r9Vg4",
   authDomain: "garaa-mulataa.firebaseapp.com",
@@ -99,45 +107,66 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Fetch News
+// 1. Fetch News
 db.collection("news").orderBy("time", "desc").onSnapshot(s => {
-    let html = ""; 
-    s.forEach(d => { 
+    let html = "";
+    s.forEach(d => {
         const data = d.data();
-        html += `<div class="item-row"><h3>${data.title}</h3><p>${data.desc}</p></div>`; 
+        html += `<div class="item-row"><h3>${data.title}</h3><p>${data.desc}</p></div>`;
     });
-    document.getElementById("newsFeed").innerHTML = html || "Odeeffannoon hin jiru.";
+    document.getElementById("newsFeed").innerHTML = html || "Odeeffannoon ammaaf hin jiru.";
 });
 
-// Fetch Gallery
+// 2. Fetch Gallery (Logic for Photo and Video)
 db.collection("media").orderBy("time", "desc").onSnapshot(s => {
     let html = "";
     s.forEach(d => {
         const data = d.data();
-        html += `<div class="gallery-item"><img src="${data.url}"><p>${data.desc}</p></div>`;
+        const url = data.url.toLowerCase();
+        // Viidiyoo ta'uu isaa check gochuuf (.mp4, .mov, etc)
+        const isVideo = url.includes(".mp4") || url.includes(".mov") || url.includes(".webm") || url.includes("youtu");
+
+        if (isVideo) {
+            html += `<div class="gallery-item"><video src="${data.url}" controls></video><p>${data.desc}</p></div>`;
+        } else {
+            html += `<div class="gallery-item"><img src="${data.url}" onerror="this.src='https://via.placeholder.com/300?text=Image+Not+Found'"><p>${data.desc}</p></div>`;
+        }
     });
-    document.getElementById("mediaGallery").innerHTML = html || "Suuraan hin jiru.";
+    document.getElementById("mediaGallery").innerHTML = html || "Galmeen ammaaf duwwaadha.";
 });
 
-function showAdmin() { if(prompt("Password Admin Galchi:") === "1234") document.getElementById("adminArea").style.display = "block"; }
+function showAdmin() {
+    let pass = prompt("Password Admin Galchi:");
+    if (pass === "1234") {
+        document.getElementById("adminArea").style.display = "block";
+        window.scrollTo(0, document.body.scrollHeight);
+    } else {
+        alert("Password Dogoggora!");
+    }
+}
 
 function publish() {
-    const t = document.getElementById("pType").value;
+    const type = document.getElementById("pType").value;
     const title = document.getElementById("pTitle").value;
     const desc = document.getElementById("pDesc").value;
     
-    if(!title || !desc) return alert("Maaloo bakka duwwaa guuti!");
+    if(!title || !desc) return alert("Maaloo bakka duwwaa hunda guuti!");
     
-    const col = (t === "news") ? "news" : "media";
-    const payload = (t === "news") ? { title, desc } : { url: title, desc };
+    const col = (type === "news") ? "news" : "media";
+    const payload = (type === "news") ? { title, desc } : { url: title, desc };
     payload.time = firebase.firestore.FieldValue.serverTimestamp();
     
     db.collection(col).add(payload).then(() => { 
-        alert("Odeeffannoon milkiidhaan galeera! ✅");
-        location.reload(); 
-    }).catch(e => alert("Error: " + e.message));
+        alert("Milkiidhaan Galmeeffameera! ✅");
+        document.getElementById("pTitle").value = "";
+        document.getElementById("pDesc").value = "";
+    }).catch(e => {
+        console.error(e);
+        alert("Dogoggora: Rules kee 'True' gochuu kee mirkaneessi!");
+    });
 }
 </script>
 </body>
 </html>
+
 
