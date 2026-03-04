@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="om">
 <head>
@@ -31,11 +32,11 @@ h2{color:var(--main);margin-bottom:15px;}
 .contact-card{border-top:5px solid var(--gold);}
 .whatsapp-btn{background:#25d366;color:white;padding:15px;border-radius:12px;display:inline-block;text-decoration:none;font-weight:bold;transition:0.3s;margin-top:15px;}
 .whatsapp-btn:hover{background:#128c7e;transform:translateY(-2px);}
-#adminArea{display:none;background:#fffde7;border:2px dashed var(--gold);margin-top:20px;}
+#adminArea{display:none;background:#fffde7;border:2px dashed var(--gold);margin-top:20px;text-align:left;}
 input,textarea,select,button{width:100%;padding:14px;margin:10px 0;border-radius:10px;border:1px solid #ccc;font-size:16px;box-sizing:border-box;}
 .btn-post{background:var(--main);color:white;font-weight:bold;border:none;cursor:pointer;text-transform:uppercase;}
 .btn-post:hover{background:#1b5e20;}
-.admin-toggle{background:#333;color:#999;font-size:10px;padding:5px;border:none;border-radius:5px;cursor:pointer;display:block;margin:20px auto;}
+.admin-toggle{background:#333;color:#999;font-size:10px;padding:5px;border:none;border-radius:5px;display:block;margin:20px auto;}
 #scrollTopBtn{position:fixed;bottom:30px;right:30px;background:var(--main);color:#fff;padding:12px 16px;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:none;z-index:1000;transition:0.3s;}
 #scrollTopBtn:hover{background:#1b5e20;}
 @media(max-width:768px){header{padding:60px 15px;}.hero-buttons a{padding:12px 20px;font-size:0.9rem;}.gallery-grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;}.card{padding:20px;}}
@@ -80,6 +81,7 @@ input,textarea,select,button{width:100%;padding:14px;margin:10px 0;border-radius
 <section id="gallery" class="container">
   <div class="card gallery-card">
     <h2>🖼️ Gallery</h2>
+    <input type="file" id="mediaFile" accept="image/*,video/*">
     <div class="gallery-grid" id="mediaGallery"></div>
   </div>
 </section>
@@ -97,23 +99,20 @@ input,textarea,select,button{width:100%;padding:14px;margin:10px 0;border-radius
 <button class="admin-toggle" onclick="showAdmin()">ADMIN LOGIN</button>
 <div id="adminArea" class="card">
   <h2>✍️ Admin Control Panel</h2>
-  <p style="font-size:13px;color:#666;">Suuraa/Viidiyoo galchuuf linkii (URL) kallaattiin itti naqaa.</p>
-  <select id="pType">
-    <option value="news">Odeeffannoo (Barreeffama)</option>
-    <option value="media">Galmee (Suuraa ykn Viidiyoo)</option>
-  </select>
-  <input type="text" id="pTitle" placeholder="Mataduree ykn Linkii URL">
-  <textarea id="pDesc" placeholder="Ibsa gabaabaa asitti barreessi..."></textarea>
-  <button class="btn-post" onclick="publish()">PUBLISH NOW</button>
+  <p style="font-size:13px;color:#666;">Select file from computer and add description</p>
+  <textarea id="pDesc" placeholder="Description here..."></textarea>
+  <button class="btn-post" onclick="uploadFile()">UPLOAD FILE</button>
 </div>
 
 <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
+
 <script>
-// === Firebase config duraa kee ===
+// --- Firebase config duraa ---
 const firebaseConfig = {
   apiKey: "AIzaSyC-Owlqf-GVkm296DXT2ccR212x72r9Vg4",
   authDomain: "garaa-mulataa.firebaseapp.com",
@@ -124,15 +123,12 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const storage = firebase.storage();
 
-// QR code using QRious
-const qr = new QRious({
-  element: document.getElementById('donateQR'),
-  value: "https://example.com/donate", // gara URL duraa jijjiiri
-  size: 180
-});
+// QR code
+const qr = new QRious({ element: document.getElementById('donateQR'), value: "https://example.com/donate", size: 180 });
 
-// Fetch media gallery
+// --- Fetch gallery ---
 db.collection("media").orderBy("time","desc").onSnapshot(s=>{
   let html="";
   s.forEach(d=>{
@@ -141,14 +137,14 @@ db.collection("media").orderBy("time","desc").onSnapshot(s=>{
     const isVideo=url.includes(".mp4")||url.includes(".mov")||url.includes("youtu");
     if(isVideo){
       html+=`<div class="gallery-item"><video src="${data.url}" controls></video><p>${data.desc}</p></div>`;
-    } else {
+    }else{
       html+=`<div class="gallery-item"><img src="${data.url}" alt="Gallery Image"><p>${data.desc}</p></div>`;
     }
   });
   document.getElementById("mediaGallery").innerHTML=html||"<p style='text-align:center'>Galmeen ammaaf duwwaadha.</p>";
 });
 
-// Fetch news feed live
+// --- Fetch news ---
 db.collection("news").orderBy("time","desc").onSnapshot(s=>{
   let html="";
   s.forEach(d=>{
@@ -158,31 +154,33 @@ db.collection("news").orderBy("time","desc").onSnapshot(s=>{
   document.getElementById("newsFeed").innerHTML=html||"<p style='text-align:center'>Odeeffannoon ammaaf hin jiru.</p>";
 });
 
-// Admin
+// --- Admin ---
 function showAdmin(){
   let pass = prompt("Password Admin Galchi:");
   if(pass==="1234"){document.getElementById("adminArea").style.display="block";window.scrollTo(0,document.body.scrollHeight);}
   else{alert("Password Dogoggora!");}
 }
-function publish(){
-  const type=document.getElementById("pType").value;
-  const title=document.getElementById("pTitle").value;
+
+// --- File Upload ---
+async function uploadFile(){
+  const fileInput=document.getElementById("mediaFile");
+  const file=fileInput.files[0];
   const desc=document.getElementById("pDesc").value;
-  if(!title||!desc)return alert("Maaloo bakka duwwaa hunda guuti!");
-  const col=(type==="news")?"news":"media";
-  const payload=(type==="news")?{title,desc}:{url:title,desc};
-  payload.time=firebase.firestore.FieldValue.serverTimestamp();
-  db.collection(col).add(payload)
-    .then(()=>{ alert("Milkiidhaan Galmeeffameera! ✅"); document.getElementById("pTitle").value=""; document.getElementById("pDesc").value=""; })
-    .catch(e=>{ console.error(e); alert("Dogoggora: Rules kee 'True' gochuu kee mirkaneessi!"); });
+  if(!file || !desc) return alert("File fi description guuti!");
+  const storageRef=storage.ref('media/'+file.name);
+  await storageRef.put(file);
+  const url=await storageRef.child(file.name).getDownloadURL();
+  await db.collection('media').add({ url, desc, time: firebase.firestore.FieldValue.serverTimestamp() });
+  alert("Upload successful!");
+  fileInput.value=""; document.getElementById("pDesc").value="";
 }
 
-// Scroll-to-top button
+// --- Scroll-top button ---
 const scrollBtn=document.getElementById("scrollTopBtn");
 window.onscroll=function(){if(document.body.scrollTop>200||document.documentElement.scrollTop>200){scrollBtn.style.display="block";}else{scrollBtn.style.display="none";}};
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
 
-// Fade-in animations
+// --- Fade-in animations ---
 const fadeElems=document.querySelectorAll('.card,.hero-overlay,header h1,header p,.hero-buttons a');
 function checkFade(){fadeElems.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight-100){el.classList.add('visible');}});}
 window.addEventListener('scroll',checkFade);
