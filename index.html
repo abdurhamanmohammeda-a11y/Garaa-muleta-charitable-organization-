@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="om">
 <head>
@@ -81,9 +80,6 @@ input,textarea,select,button{width:100%;padding:14px;margin:10px 0;border-radius
 <section id="gallery" class="container">
   <div class="card gallery-card">
     <h2>🖼️ Gallery</h2>
-    <input type="file" id="mediaFile" accept="image/*,video/*">
-    <textarea id="pDesc" placeholder="Description here..."></textarea>
-    <button class="btn-post" onclick="uploadFile()">UPLOAD FILE</button>
     <div class="gallery-grid" id="mediaGallery"></div>
   </div>
 </section>
@@ -99,8 +95,18 @@ input,textarea,select,button{width:100%;padding:14px;margin:10px 0;border-radius
 </section>
 
 <button class="admin-toggle" onclick="showAdmin()">ADMIN LOGIN</button>
-
 <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+
+<div id="adminArea" class="card">
+  <h2>✍️ Admin Control Panel</h2>
+  <p style="font-size:13px;color:#666;">Select file from computer, add description, upload or delete safely.</p>
+  <input type="file" id="mediaFile" accept="image/*,video/*">
+  <textarea id="pDesc" placeholder="Description here..."></textarea>
+  <button class="btn-post" onclick="uploadFile()">UPLOAD FILE</button>
+  <hr style="margin:20px 0;">
+  <h3>📢 Recent Media</h3>
+  <div id="adminGallery" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;"></div>
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -122,7 +128,7 @@ const db = firebase.firestore();
 const storage = firebase.storage();
 
 // QR code
-const qr = new QRious({ element: document.getElementById('donateQR'), value: "https://example.com/donate", size: 180 });
+new QRious({ element: document.getElementById('donateQR'), value: "https://example.com/donate", size: 180 });
 
 // Fetch news
 db.collection("news").orderBy("time","desc").onSnapshot(s=>{
@@ -139,25 +145,28 @@ db.collection("media").orderBy("time","desc").onSnapshot(s=>{
   let html="";
   s.forEach(d=>{
     const data=d.data();
-    const url=data.url.toLowerCase();
+    const id=d.id;
+    const url=data.url;
     const isVideo=url.includes(".mp4")||url.includes(".mov")||url.includes("youtu");
-    if(isVideo){ html+=`<div class="gallery-item"><video src="${url}" controls></video><p>${data.desc}</p></div>`;}
-    else{ html+=`<div class="gallery-item"><img src="${url}" alt="Gallery Image"><p>${data.desc}</p></div>`;}
+    if(isVideo){
+      html+=`<div class="gallery-item"><video src="${url}" controls></video><p>${data.desc}</p><button onclick="deleteMedia('${id}','${url}')">🗑 Delete</button></div>`;
+    } else {
+      html+=`<div class="gallery-item"><img src="${url}" alt="Gallery Image"><p>${data.desc}</p><button onclick="deleteMedia('${id}','${url}')">🗑 Delete</button></div>`;
+    }
   });
-  document.getElementById("mediaGallery").innerHTML=html||"<p style='text-align:center'>Galmeen ammaaf duwwaadha.</p>";
+  document.getElementById("mediaGallery").innerHTML=html;
+  document.getElementById("adminGallery") && (document.getElementById("adminGallery").innerHTML = html);
 });
 
-// Admin
+// Admin functions
 function showAdmin(){
   let pass=prompt("Password Admin Galchi:");
   if(pass==="1234"){document.getElementById("adminArea").style.display="block";window.scrollTo(0,document.body.scrollHeight);}
   else{alert("Password Dogoggora!");}
 }
 
-// File Upload
 async function uploadFile(){
-  const fileInput=document.getElementById("mediaFile");
-  const file=fileInput.files[0];
+  const file=document.getElementById("mediaFile").files[0];
   const desc=document.getElementById("pDesc").value;
   if(!file || !desc) return alert("File fi description guuti!");
   const storageRef=storage.ref('media/'+file.name);
@@ -165,15 +174,24 @@ async function uploadFile(){
   const url=await storageRef.child(file.name).getDownloadURL();
   await db.collection('media').add({ url, desc, time: firebase.firestore.FieldValue.serverTimestamp() });
   alert("Upload successful!");
-  fileInput.value=""; document.getElementById("pDesc").value="";
+  document.getElementById("mediaFile").value="";
+  document.getElementById("pDesc").value="";
 }
 
-// Scroll-top button
+// Delete function
+async function deleteMedia(docId, fileUrl){
+  if(!confirm("Are you sure you want to delete this media?")) return;
+  await db.collection("media").doc(docId).delete();
+  await storage.refFromURL(fileUrl).delete();
+  alert("Media deleted successfully!");
+}
+
+// Scroll top
 const scrollBtn=document.getElementById("scrollTopBtn");
-window.onscroll=function(){if(document.body.scrollTop>200||document.documentElement.scrollTop>200){scrollBtn.style.display="block";}else{scrollBtn.style.display="none";}};
+window.onscroll=function(){scrollBtn.style.display=(document.body.scrollTop>200||document.documentElement.scrollTop>200)?'block':'none';};
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
 
-// Fade-in animations
+// Fade-in animation
 const fadeElems=document.querySelectorAll('.card,.hero-overlay,header h1,header p,.hero-buttons a');
 function checkFade(){fadeElems.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight-100){el.classList.add('visible');}});}
 window.addEventListener('scroll',checkFade);
