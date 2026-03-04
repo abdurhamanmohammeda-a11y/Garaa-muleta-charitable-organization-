@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
 <style>
 :root{--main:#2E7D32;--gold:#FFD700;--dark:#1b1b1b;--white:#fff;}
-body{margin:0;font-family:'Poppins',sans-serif;background:#f0f2f5;color:#333;line-height:1.6;scroll-behavior:smooth;position:relative;}
+body{margin:0;font-family:'Poppins',sans-serif;background:#f0f2f5;color:#333;line-height:1.6;scroll-behavior:smooth;}
 header{background:linear-gradient(rgba(2,48,71,0.6),rgba(2,48,71,0.6)),url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1000&q=80');background-size:cover;background-position:center;color:#FFD700;text-align:center;padding:80px 20px;}
 header h1{font-size:clamp(32px,6vw,50px);margin-bottom:15px;text-transform:uppercase;letter-spacing:2px;opacity:0;transform:translateY(20px);transition:0.8s ease-out;}
 header p{font-size:clamp(16px,2vw,22px);opacity:0;transform:translateY(20px);transition:0.8s ease-out;}
@@ -32,7 +32,7 @@ h2{color:var(--main);margin-bottom:15px;}
 .contact-card{border-top:5px solid var(--gold);}
 .whatsapp-btn{background:#25d366;color:white;padding:15px;border-radius:12px;display:inline-block;text-decoration:none;font-weight:bold;transition:0.3s;margin-top:15px;}
 .whatsapp-btn:hover{background:#128c7e;transform:translateY(-2px);}
-#adminArea{display:none;background:#fffde7;border:2px dashed var(--gold);margin-top:20px;text-align:left;}
+#adminArea{display:none;background:#fffde7;border:2px dashed var(--gold);margin-top:20px;text-align:left;width:100%;max-width:900px;margin:auto;padding:25px;}
 input,textarea,select,button{width:100%;padding:14px;margin:10px 0;border-radius:10px;border:1px solid #ccc;font-size:16px;box-sizing:border-box;}
 .btn-post{background:var(--main);color:white;font-weight:bold;border:none;cursor:pointer;text-transform:uppercase;}
 .btn-post:hover{background:#1b5e20;}
@@ -82,6 +82,8 @@ input,textarea,select,button{width:100%;padding:14px;margin:10px 0;border-radius
   <div class="card gallery-card">
     <h2>🖼️ Gallery</h2>
     <input type="file" id="mediaFile" accept="image/*,video/*">
+    <textarea id="pDesc" placeholder="Description here..."></textarea>
+    <button class="btn-post" onclick="uploadFile()">UPLOAD FILE</button>
     <div class="gallery-grid" id="mediaGallery"></div>
   </div>
 </section>
@@ -97,12 +99,6 @@ input,textarea,select,button{width:100%;padding:14px;margin:10px 0;border-radius
 </section>
 
 <button class="admin-toggle" onclick="showAdmin()">ADMIN LOGIN</button>
-<div id="adminArea" class="card">
-  <h2>✍️ Admin Control Panel</h2>
-  <p style="font-size:13px;color:#666;">Select file from computer and add description</p>
-  <textarea id="pDesc" placeholder="Description here..."></textarea>
-  <button class="btn-post" onclick="uploadFile()">UPLOAD FILE</button>
-</div>
 
 <button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
 
@@ -112,7 +108,7 @@ input,textarea,select,button{width:100%;padding:14px;margin:10px 0;border-radius
 <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 
 <script>
-// --- Firebase config duraa ---
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyC-Owlqf-GVkm296DXT2ccR212x72r9Vg4",
   authDomain: "garaa-mulataa.firebaseapp.com",
@@ -128,23 +124,7 @@ const storage = firebase.storage();
 // QR code
 const qr = new QRious({ element: document.getElementById('donateQR'), value: "https://example.com/donate", size: 180 });
 
-// --- Fetch gallery ---
-db.collection("media").orderBy("time","desc").onSnapshot(s=>{
-  let html="";
-  s.forEach(d=>{
-    const data=d.data();
-    const url=data.url.toLowerCase();
-    const isVideo=url.includes(".mp4")||url.includes(".mov")||url.includes("youtu");
-    if(isVideo){
-      html+=`<div class="gallery-item"><video src="${data.url}" controls></video><p>${data.desc}</p></div>`;
-    }else{
-      html+=`<div class="gallery-item"><img src="${data.url}" alt="Gallery Image"><p>${data.desc}</p></div>`;
-    }
-  });
-  document.getElementById("mediaGallery").innerHTML=html||"<p style='text-align:center'>Galmeen ammaaf duwwaadha.</p>";
-});
-
-// --- Fetch news ---
+// Fetch news
 db.collection("news").orderBy("time","desc").onSnapshot(s=>{
   let html="";
   s.forEach(d=>{
@@ -154,14 +134,27 @@ db.collection("news").orderBy("time","desc").onSnapshot(s=>{
   document.getElementById("newsFeed").innerHTML=html||"<p style='text-align:center'>Odeeffannoon ammaaf hin jiru.</p>";
 });
 
-// --- Admin ---
+// Fetch gallery
+db.collection("media").orderBy("time","desc").onSnapshot(s=>{
+  let html="";
+  s.forEach(d=>{
+    const data=d.data();
+    const url=data.url.toLowerCase();
+    const isVideo=url.includes(".mp4")||url.includes(".mov")||url.includes("youtu");
+    if(isVideo){ html+=`<div class="gallery-item"><video src="${url}" controls></video><p>${data.desc}</p></div>`;}
+    else{ html+=`<div class="gallery-item"><img src="${url}" alt="Gallery Image"><p>${data.desc}</p></div>`;}
+  });
+  document.getElementById("mediaGallery").innerHTML=html||"<p style='text-align:center'>Galmeen ammaaf duwwaadha.</p>";
+});
+
+// Admin
 function showAdmin(){
-  let pass = prompt("Password Admin Galchi:");
+  let pass=prompt("Password Admin Galchi:");
   if(pass==="1234"){document.getElementById("adminArea").style.display="block";window.scrollTo(0,document.body.scrollHeight);}
   else{alert("Password Dogoggora!");}
 }
 
-// --- File Upload ---
+// File Upload
 async function uploadFile(){
   const fileInput=document.getElementById("mediaFile");
   const file=fileInput.files[0];
@@ -175,12 +168,12 @@ async function uploadFile(){
   fileInput.value=""; document.getElementById("pDesc").value="";
 }
 
-// --- Scroll-top button ---
+// Scroll-top button
 const scrollBtn=document.getElementById("scrollTopBtn");
 window.onscroll=function(){if(document.body.scrollTop>200||document.documentElement.scrollTop>200){scrollBtn.style.display="block";}else{scrollBtn.style.display="none";}};
 function scrollToTop(){window.scrollTo({top:0,behavior:'smooth'});}
 
-// --- Fade-in animations ---
+// Fade-in animations
 const fadeElems=document.querySelectorAll('.card,.hero-overlay,header h1,header p,.hero-buttons a');
 function checkFade(){fadeElems.forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight-100){el.classList.add('visible');}});}
 window.addEventListener('scroll',checkFade);
